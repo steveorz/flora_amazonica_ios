@@ -1,0 +1,182 @@
+<!-- funcionalidades/catalogo-base/paginas/formulario/formulario.html -->
+
+<div class="pagina">
+
+  <div class="cabecera-pagina">
+    <div>
+      <h1>Formulario de registro</h1>
+      <p class="subtitulo">Configura los campos morfológicos que verá el registrador según el hábito.</p>
+    </div>
+    <div class="acciones-cabecera">
+      <button class="btn-secundario" type="button" (click)="crearSeccion()">+ Nueva sección</button>
+      <button class="btn-nuevo" type="button" (click)="abrirNuevo()">+ Nuevo campo</button>
+    </div>
+  </div>
+
+  <p class="etiqueta-seccion">Hábito</p>
+  <div class="pills-habito">
+    @for (habito of habitos; track habito) {
+      <button type="button" class="pill" [class.activa]="habitoActual === habito"
+              (click)="cambiarHabito(habito)">
+        {{ habito }}
+      </button>
+    }
+  </div>
+
+  <p class="etiqueta-seccion">
+    Campos morfológicos — <span class="habito-nombre">{{ habitoActual }}</span>
+  </p>
+
+  @if (cargando) {
+    <p class="estado">Cargando…</p>
+  }
+
+  @if (!cargando && items.length === 0) {
+    <div class="vacio">
+      <p>Este hábito aún no tiene campos morfológicos configurados.</p>
+      <div class="vacio-acciones">
+        <button class="btn-secundario" type="button" (click)="crearSeccion()">+ Nueva sección</button>
+        <button class="btn-nuevo" type="button" (click)="abrirNuevo()">+ Nuevo campo</button>
+      </div>
+    </div>
+  }
+
+  @if (!cargando && items.length > 0) {
+
+    <div class="lista-grupos"
+         cdkDropList
+         id="lista-principal"
+         [cdkDropListData]="items"
+         [cdkDropListConnectedTo]="idsListasSecciones"
+         (cdkDropListDropped)="onSoltarEnPrincipal($event)">
+
+      @for (item of items; track (item.tipo === 'seccion' ? item.seccion.id : item.campo.clave)) {
+
+        @if (item.tipo === 'seccion') {
+          <div class="bloque-seccion" cdkDrag [cdkDragData]="item">
+
+            <div class="seccion-cabecera" cdkDragHandle>
+              <span class="asa-seccion">☰</span>
+              <span class="seccion-nombre">{{ item.seccion.name }}</span>
+              <button class="btn-icono-sm" type="button" title="Editar sección"
+                      (click)="iniciarEdicionSeccion(item.seccion)">✎</button>
+              <button class="btn-icono-sm btn-eliminar" type="button" title="Eliminar sección"
+                      (click)="eliminarSeccion(item.seccion)">🗑</button>
+            </div>
+
+            <div class="seccion-campos"
+                 cdkDropList
+                 [id]="'lista-' + item.seccion.id"
+                 [cdkDropListData]="item.campos"
+                 [cdkDropListConnectedTo]="idsTodasLasListas"
+                 [cdkDropListEnterPredicate]="soloCampos"
+                 (cdkDropListDropped)="onSoltarEnSeccion($event, item.seccion)">
+
+              @for (campo of item.campos; track campo.clave) {
+                <div cdkDrag [cdkDragData]="campo" class="campo-drag">
+                  <!-- dentro de sección -->
+                  <app-bloque-campo
+                    [campo]="campo"
+                    (editarCampo)="abrirEdicion($event)"
+                    (alternarCampo)="alternarCampo($event)"
+                    (toggleFiltro)="onToggleFiltro($event)"
+                    (agregarOpcion)="agregarOpcion($event)"
+                    (editarOpcion)="editarOpcion($event)"
+                    (alternarOpcion)="alternarOpcion($event)">
+                  </app-bloque-campo>
+                </div>
+              }
+
+              @if (item.campos.length === 0) {
+                <p class="zona-vacia-texto">Arrastra campos aquí</p>
+              }
+
+            </div>
+
+            <button class="btn-nuevo-campo-seccion" type="button"
+                    (click)="abrirNuevo(item.seccion.name)">
+              + Nuevo campo
+            </button>
+
+          </div>
+
+        } @else {
+
+          <div cdkDrag [cdkDragData]="item" class="campo-drag campo-suelto">
+            <app-bloque-campo
+              [campo]="item.campo"
+              (editarCampo)="abrirEdicion($event)"
+              (alternarCampo)="alternarCampo($event)"
+              (toggleFiltro)="onToggleFiltro($event)"
+              (agregarOpcion)="agregarOpcion($event)"
+              (editarOpcion)="editarOpcion($event)"
+              (alternarOpcion)="alternarOpcion($event)">
+            </app-bloque-campo>
+          </div>
+
+        }
+
+      }
+
+    </div>
+
+    <div class="pie-pagina">
+      <button class="btn-guardar" type="button"
+              [disabled]="!hayCambios"
+              (click)="guardarCambios()">
+        Guardar cambios
+      </button>
+    </div>
+
+  }
+
+</div>
+
+@if (modalAbierto) {
+  <app-modal-campo
+    [campo]="campoEnEdicion"
+    [habitoActual]="habitoActual"
+    [habitosGemelos]="habitosGemelos"
+    [seccionInicial]="seccionContexto"
+    [seccionesPorHabito]="seccionesPorHabito"
+    (confirmar)="onConfirmarModal($event)"
+    (cerrar)="cerrarModal()">
+  </app-modal-campo>
+}
+
+@if (modalSeccionAbierto) {
+  <app-modal-seccion
+    [seccion]="seccionEnEdicion"
+    (confirmar)="onConfirmarModalSeccion($event)"
+    (cerrar)="cerrarModalSeccion()">
+  </app-modal-seccion>
+}
+
+@if (modalOpcionAbierto && opcionEnEdicion) {
+  <app-modal-opcion
+    [valorInicial]="opcionEnEdicion.opcion?.option_value ?? ''"
+    [titulo]="opcionEnEdicion.opcion ? 'Editar opción' : 'Nueva opción'"
+    (confirmar)="onConfirmarModalOpcion($event)"
+    (cerrar)="cerrarModalOpcion()">
+  </app-modal-opcion>
+}
+
+@if (modalFiltroAbierto && campoFiltroPendiente) {
+  <div class="overlay-filtro" (click)="cerrarModalFiltro()">
+    <div class="modal-filtro" (click)="$event.stopPropagation()">
+      <p class="modal-filtro-texto">
+        {{ campoFiltroPendiente.use_in_search
+          ? '¿Desea desactivar este campo para búsquedas del filtro?'
+          : '¿Desea activar este campo para búsquedas del filtro?' }}
+      </p>
+      <div class="modal-filtro-acciones">
+        <button class="btn-secundario" type="button" (click)="cerrarModalFiltro()">Rechazar</button>
+        <button class="btn-nuevo" type="button" (click)="confirmarToggleFiltro()">Aceptar</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (mensaje) {
+  <div class="toast">{{ mensaje }}</div>
+}

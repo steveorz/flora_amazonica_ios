@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- La app está escrita en español: los controles del sistema (p. ej. el botón
+	     de Apple) se localizan según este idioma. -->
+	<key>CFBundleDevelopmentRegion</key>
+	<string>es</string>
+	<!-- Nombre visible bajo el ícono en la pantalla de inicio. -->
+	<key>CFBundleDisplayName</key>
+	<string>FlorAmaz</string>
+	<!-- Guardar en Fotos: descarga de imágenes del catálogo con marca de agua. -->
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FlorAmaz guarda en tu fototeca las fotos del catálogo que descargues.</string>
+	<!-- GPS: para centrar el mapa en el punto exacto del registro de campo. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>FlorAmaz usa tu ubicación para registrar el punto exacto donde encontraste la especie.</string>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- Permite HTTP hacia localhost:3000 durante desarrollo. -->
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

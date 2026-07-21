@@ -1,0 +1,43 @@
+<aside class="barra-lateral">
+  <div class="barra-lateral-logo">
+    <img src="LogoHorizontal.png" alt="Flora Amazónica" />
+  </div>
+
+  <nav class="barra-lateral-nav">
+    @for (elemento of elementosNav; track elemento.etiqueta) {
+      @if (elemento.ruta) {
+        <button
+          class="barra-lateral-enlace"
+          [routerLink]="elemento.ruta"
+          routerLinkActive="barra-lateral-enlace-activo"
+        >
+          {{ elemento.etiqueta }}
+        </button>
+      } @else {
+        <div class="grupo-nav" [class.grupo-fijado]="grupoEstaFijado(elemento.etiqueta)">
+          <button
+            type="button"
+            class="barra-lateral-enlace barra-lateral-enlace-padre"
+            (click)="alternarGrupo(elemento.etiqueta)"
+          >
+            {{ elemento.etiqueta }}
+            <span class="icono-chevron">▾</span>
+          </button>
+
+          <div class="submenu">
+            @for (subElemento of elemento.subElementos; track subElemento.ruta) {
+              <button
+                class="barra-lateral-enlace barra-lateral-subenlace"
+                [routerLink]="subElemento.ruta"
+                routerLinkActive="barra-lateral-enlace-activo"
+                (click)="cerrarGrupo()"
+              >
+                {{ subElemento.etiqueta }}
+              </button>
+            }
+          </div>
+        </div>
+      }
+    }
+  </nav>
+</aside>

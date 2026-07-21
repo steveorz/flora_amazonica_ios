@@ -1,0 +1,22 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;800&family=Playfair+Display:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Almendra+SC&family=Montenegrin+Gothic+One&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --verde-oscuro: #2d6a45;
+  --verde-hover: #235538;
+  --verde-claro: #e8f2ec;
+}
+
+html, body, app-root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Fix tiles Leaflet — evita que el reset de Tailwind deforme las imágenes del mapa */
+.leaflet-container img,
+.leaflet-tile {
+  max-width: none !important;
+}

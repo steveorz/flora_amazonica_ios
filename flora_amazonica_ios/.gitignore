@@ -1,0 +1,9 @@
+# Xcode
+xcuserdata/
+DerivedData/
+.DS_Store
+
+# Editor / assistant local state
+.vscode/
+.claude/
+FloraAmazonica-BackendAPI/
